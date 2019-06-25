@@ -32,11 +32,11 @@
           <span class="vm">{{rocketbotGlobal.edit?this.$t('editmode'):this.$t('usermode')}}</span>
         </div>
       </div>
-      <div class="sm flex-h">
+      <!--<div class="sm flex-h">
         <RkDate v-model="time" position="top" format="YYYY-MM-DD HH:mm:ss"/>
         <span class="mr-15 cp" @click="setLang">{{lang === 'zh' ? '中' : 'En'}}</span>
         <span>UTC {{utc >= 0 ? '+' : ''}}</span><input v-model="utc" min='-12' max="12" class="rk-footer-utc" type="number">
-      </div>
+      </div>-->
     </div>
   </footer>
 </template>
@@ -51,7 +51,7 @@ export default class Footer extends Vue {
   @State('rocketbot') private rocketbotGlobal: any;
   @Action('SET_DURATION') private SET_DURATION: any;
   @Action('SET_EDIT') private SET_EDIT: any;
-  private lang: any = '';
+  private lang: any = 'zh';
   private time: Date[] = [new Date(), new Date()];
   private utc: any = window.localStorage.getItem('utc') || -(new Date().getTimezoneOffset() / 60);
   private utcCopy: any = window.localStorage.getItem('utc') || -(new Date().getTimezoneOffset() / 60);
@@ -87,7 +87,7 @@ export default class Footer extends Vue {
     dashboardInner.reload();
   }
   private beforeMount() {
-    this.lang = window.localStorage.getItem('lang');
+    // this.lang = window.localStorage.getItem('lang');
     this.time = [this.rocketbotGlobal.duration.start, this.rocketbotGlobal.duration.end];
   }
 }

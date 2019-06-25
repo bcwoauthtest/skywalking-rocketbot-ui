@@ -16,11 +16,12 @@
  */
 
 export const Services = {
-  variable: '$duration: Duration!',
+  variable: '$isAddress: String, $tenantId: String, $bsIds: String, $duration: Duration!',
   query: `
-    services: getAllServices(duration: $duration) {
+    services: getAllServices(isAddress: $isAddress, tenantId: $tenantId, bsIds: $bsIds, duration: $duration) {
       key: id
       label: name
+      userDefName
     }
   `};
 
@@ -52,5 +53,27 @@ export const Instances = {
         name
         value
       }
+    }
+  `};
+
+export const BsInfos = {
+    variable: '$tenantId: String!',
+    query: `
+    getBsInfo(tenantId: $tenantId) {
+      tenantName
+      infos{
+        key: id
+        label: name
+      }
+    }
+  `};
+
+export const CiServices = {
+  variable: '$ciId: ID, $ciCode: String, $duration: Duration!',
+  query: `
+    services: searchServicesByCi(ciId: $ciId, ciCode: $ciCode, duration: $duration) {
+      key: id
+      label: name
+      userDefName
     }
   `};

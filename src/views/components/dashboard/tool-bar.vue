@@ -49,6 +49,7 @@ import ToolBarEndpointSelect from './tool-bar-select-endpoint.vue';
 import { State, Action } from 'vuex-class';
 @Component({components: {ToolBarSelect, ToolBarEndpointSelect}})
 export default class ToolBar extends Vue {
+  @State('rocketbot') private rocketbotGlobal: any;
   @Prop() private compType!: any;
   @Prop() private stateDashboard!: any;
   @Prop() private durationTime!: any;
@@ -58,7 +59,7 @@ export default class ToolBar extends Vue {
   @Action('rocketDashboard/SELECT_INSTANCE') private SELECT_INSTANCE: any;
   @Action('rocketDashboard/MIXHANDLE_GET_OPTION') private MIXHANDLE_GET_OPTION: any;
   private handleOption() {
-    return this.MIXHANDLE_GET_OPTION({compType: this.compType, duration: this.durationTime});
+    return this.MIXHANDLE_GET_OPTION({tenantId: this.rocketbotGlobal.currentTenant, compType: this.compType, duration: this.durationTime});
   }
   private selectService(i: any) {
     this.SELECT_SERVICE({service: i, duration: this.durationTime});

@@ -15,15 +15,23 @@
  * limitations under the License.
  */
 
-import { Topo, TopoMetric,
-  TopoServiceMetric, TopoClientMetric, TopoServiceInfo, TopoClientInfo } from '../fragments/topology';
+import { Topo, ServiceTopo, TopoMetric, TopoServiceMetric, TopoClientMetric, TopoServiceInfo,
+    TopoClientInfo, TopoInfo, UpdateDefName, UpdateDefNodeType, ServicesTopo,
+    WrappedBsTopo, WrappedTsTopo, UpdateDefBSName, UpdateDefTSName, WrappedNodeTopo,
+    UpdateDefNodeName } from '../fragments/topology';
 
 export const queryTopo =
   `query queryTraces(${Topo.variable}) {${Topo.query}}`;
 
+export const queryServicesTopo =
+  `query queryServicesTopo(${ServicesTopo.variable}) {${ServicesTopo.query}}`;
+
+export const queryServiceTopo =
+  `query queryService(${ServiceTopo.variable}) {${ServiceTopo.query}}`;
+
 export const queryTopoInfo =
   `query queryTrace(
-    ${Topo.variable},
+    ${TopoInfo.variable},
     ${TopoMetric.variable},
     ${TopoServiceMetric.variable},
     ${TopoClientMetric.variable})
@@ -38,3 +46,27 @@ export const queryTopoServiceInfo =
 
 export const queryTopoClientInfo =
   `query queryTopoClientInfo(${TopoClientInfo.variable}) {${TopoClientInfo.query}}`;
+
+export const updateDefName =
+  `mutation updateDefName(${UpdateDefName.variable}) {${UpdateDefName.query}}`;
+
+export const updateDefBsName =
+  `mutation updateDefName(${UpdateDefBSName.variable}) {${UpdateDefBSName.query}}`;
+
+export const updateDefTsName =
+  `mutation updateDefName(${UpdateDefTSName.variable}) {${UpdateDefTSName.query}}`;
+
+export const updateDefNodeName =
+  `mutation updateDefName(${UpdateDefNodeName.variable}) {${UpdateDefNodeName.query}}`;
+
+export const updateDefNodeType =
+  `mutation updateDefNodeType(${UpdateDefNodeType.variable}) {${UpdateDefNodeType.query}}`;
+
+export const queryWrappedBsTopo =
+  `query queryTraces(${WrappedBsTopo.variable}) {${WrappedBsTopo.query}}`;
+
+export const queryWrappedTsTopo =
+  `query queryTraces(${WrappedTsTopo.variable}) {${WrappedTsTopo.query}}`;
+
+export const queryWrappedNodeTopo =
+  `query queryTraces(${WrappedNodeTopo.variable}) {${WrappedNodeTopo.query}}`;

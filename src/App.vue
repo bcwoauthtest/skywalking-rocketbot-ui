@@ -30,6 +30,7 @@ export default class App extends Vue {
 @import './assets/styles/lib.scss';
 @import './assets/styles/style.scss';
 @import './assets/styles/grid.scss';
+@import './assets/styles/vue-multiselect.min.css';
 #app,.container{
   height: 100%;
 }

@@ -17,35 +17,50 @@
 
 <template>
   <div class="rk-topo">
-    <TopoAside/>
-    <Topo :datas="{nodes:stateTopo.nodes,calls:stateTopo.calls}"/>
+    <TopoSearch :ciServcies="stateTopo.selectedCiServcies" :selectedBsArray="rocketbotGlobal.selectedBsArray"/>
+    <TopoTool />
+    <RollUpTopo v-if="stateTopo.topoShowLevel !== 'topo'" ref="rollUpTopoChart" :datas="{nodes:stateTopo.nodes,calls:stateTopo.calls}" :coloringThreshold="stateTopo.colorThreshold" :topoLevel="stateTopo.topoShowLevel" />
+    <RollUpAside  v-if="stateTopo.topoShowLevel !== 'topo'" @clickRollUpStat="selectRollUpNode"/>
+    <Topo v-if="stateTopo.topoShowLevel === 'topo'" ref="topoChart" :datas="{nodes:stateTopo.nodes,calls:stateTopo.calls}" :coloringThreshold="stateTopo.colorThreshold"/>
+    <TopoAside v-if="stateTopo.topoShowLevel === 'topo'" @clickStat="selectNode"/>
+
   </div>
 </template>
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { State, Action, Getter, Mutation } from 'vuex-class';
-import { AxiosResponse } from 'axios';
 import Topo from '../components/topology/topo.vue';
-import TopoDate from '../components/topology/topo-date.vue';
 import TopoAside from '../components/topology/topo-aside.vue';
+import TopoSearch from '../components/topology/topo-search.vue';
+import TopoTool from '../components/topology/topo-tool.vue';
+import RollUpTopo from '../components/topology/topo-rollup.vue';
+import RollUpAside from '../components/topology/topo-rollup-aside.vue';
 import topo, { State as topoState} from '@/store/modules/topo';
 
-@Component({components: {Topo, TopoAside, TopoDate}})
+@Component({components: {Topo, TopoAside, TopoSearch, TopoTool, RollUpTopo, RollUpAside}})
 export default class Topology extends Vue {
+  @State('rocketbot') private rocketbotGlobal: any;
   @State('rocketTopo') private stateTopo!: topoState;
   @Mutation('SET_EVENTS') private SET_EVENTS: any;
   @Action('rocketTopo/GET_TOPO') private GET_TOPO: any;
+  @Action('rocketTopo/GET_SERVICES') private GET_SERVICES: any;
   @Action('rocketTopo/CLEAR_TOPO') private CLEAR_TOPO: any;
   @Action('rocketTopo/CLEAR_TOPO_INFO') private CLEAR_TOPO_INFO: any;
   @Getter('durationTime') private durationTime: any;
+  @Getter('selectedBs') private selectedBs: any;
+
   private beforeMount(): void {
-    this.SET_EVENTS([this.getTopo]);
+    // this.SET_EVENTS([this.getTopo]);
   }
   private mounted() {
-    this.getTopo();
+    this.GET_SERVICES({isAddress: '0', tenantId: this.rocketbotGlobal.currentTenant,
+        bsIds: this.rocketbotGlobal.selectedBs, duration: this.durationTime});
+    // this.getTopo();
   }
   private getTopo() {
-    this.GET_TOPO({duration: this.durationTime});
+    this.GET_TOPO({tenantId: this.rocketbotGlobal.currentTenant,
+        bsIds: this.rocketbotGlobal.selectedBs, tsIds: this.rocketbotGlobal.selectedTsId,
+        duration: this.durationTime});
   }
   private beforeCreate() {
     this.$store.registerModule('rocketTopo', topo);
@@ -55,6 +70,14 @@ export default class Topology extends Vue {
     this.CLEAR_TOPO();
     this.$store.unregisterModule('rocketTopo');
   }
+  private selectNode(applicationId: any) {
+    const topoChartElement: any = this.$refs.topoChart;
+    topoChartElement.highlightNode(applicationId);
+  }
+  private selectRollUpNode(applicationId: any) {
+    const topoChartElement: any = this.$refs.rollUpTopoChart;
+    topoChartElement.highlightNode(applicationId);
+  }
 }
 
 </script>
@@ -62,8 +85,6 @@ export default class Topology extends Vue {
 .rk-topo{
   position: relative;
   height: 100%;
-  min-height: 0;
-  display: flex;
-  background: #333840;
+  /*background: #333840;*/
 }
 </style>

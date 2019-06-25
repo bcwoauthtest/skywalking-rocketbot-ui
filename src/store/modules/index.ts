@@ -19,6 +19,8 @@ import { Commit, ActionTree, MutationTree } from 'vuex';
 import getLocalTime from '@/utils/localtime';
 import { Duration } from '../interfaces';
 import * as types from '../mutation-types';
+import {AxiosResponse} from 'axios';
+import graph from '@/graph';
 
 const w = window as any;
 let timer: any = null;
@@ -69,11 +71,26 @@ const dateFormateTime = (date: Date, step: string) => {
   if (minuteTemp < 10) { minute = `0${minuteTemp}`; }
   if (step === 'MINUTE') { return `${hour}:${minute}\n${month}-${day}`; }
 };
+
+interface BsInfo {
+    id: number;
+    name: string;
+}
+
 export interface State {
   duration: Duration;
   eventStack: any;
   chartStack: any;
   edit: boolean;
+  currentService: any;
+  tenantBs: BsInfo[];
+  selectedBs: any;
+  currentTenant: any;
+  selectedBsArray: any;
+  selectedCiId: any;
+  selectedCiCode: any;
+  selectedTsId: any;
+  currentTenantName: any;
 }
 
 let utc = w.localStorage.getItem('utc');
@@ -81,6 +98,7 @@ if (!utc) {
   utc = (-(new Date().getTimezoneOffset() / 60)).toString();
   w.localStorage.setItem('utc', utc);
 }
+w.localStorage.setItem('lang', 'zh');
 const initState: State = {
   duration: {
     start: getLocalTime(parseInt(utc, 10), new Date().getTime() - 900000),
@@ -90,6 +108,15 @@ const initState: State = {
   eventStack: [],
   chartStack: [],
   edit: false,
+  currentService: {label: '所有', key: ''},
+  tenantBs: [],
+  selectedBs: '',
+  currentTenant: '',
+  selectedBsArray: [],
+  selectedCiId: '',
+  selectedCiCode: '',
+  selectedTsId: '',
+  currentTenantName: '',
 };
 
 // getters
@@ -131,6 +158,21 @@ const getters = {
       step: stepTemp,
     };
   },
+  currentService(state: State) {
+    return state.currentService;
+  },
+  tenantBs(state: State) {
+      return state.tenantBs;
+  },
+  selectedBs(state: State) {
+    return state.selectedBs;
+  },
+  currentTenant(state: State) {
+    return state.currentTenant;
+  },
+  selectedBsArray(state: State) {
+    return state.selectedBsArray;
+  }
 };
 
 // mutations
@@ -141,6 +183,21 @@ const mutations: MutationTree<State> = {
   [types.SET_EVENTS](state: State, data: any[]) {
     state.eventStack = data;
   },
+  [types.SET_CURRENT_TOPO_SERVICE](state: State, data: any) {
+      state.currentService = data;
+  },
+  [types.SET_TENANT_BS](state: State, data: any[]) {
+    state.tenantBs = data;
+    const selectedBsIds = state.selectedBs.split(',');
+    for (const i in selectedBsIds) {
+      for (const j in data) {
+        if (data[j].key === selectedBsIds[i]) {
+          state.selectedBsArray.push(data[j]);
+          break;
+        }
+      }
+    }
+  },
   [types.SET_CHARTS](state: State, data: any[]) {
     state.chartStack.push(data);
   },
@@ -148,8 +205,26 @@ const mutations: MutationTree<State> = {
     clearTimeout(timer);
     timer = setTimeout(() => state.eventStack.forEach((event: any) => { setTimeout(event(), 0); }), 500);
   },
+  [types.SET_CURRENT_TENANT](state: State, status: string) {
+    state.currentTenant = status;
+  },
+  [types.SET_CURRENT_TENANT_NAME](state: State, status: string) {
+    state.currentTenantName = status;
+  },
   [types.SET_EDIT](state: State, status: boolean) {
     state.edit = status;
+  },
+  [types.SET_SELECTED_BS](state: State, data: string) {
+    state.selectedBs = data;
+  },
+  [types.SET_SELECTED_CI_ID](state: State, data: string) {
+    state.selectedCiId = data;
+  },
+  [types.SET_SELECTED_CI_CODE](state: State, data: string) {
+    state.selectedCiCode = data;
+  },
+  [types.SET_SELECTED_TS](state: State, data: string) {
+    state.selectedTsId = data;
   },
 };
 
@@ -174,6 +249,16 @@ const actions: ActionTree<State, any> = {
   },
   SET_EDIT(context: { commit: Commit }, status: boolean) {
     context.commit(types.SET_EDIT, status);
+  },
+  GET_TENANT_BS_INFO(context: { commit: Commit; state: State; }, params: any) {
+    /*context.commit('SET_TENANT_BS',[{key:'1', label:'1111'}, {key:'2', label:'2222'}])*/
+    return graph
+      .query('queryBsInfos')
+      .params(params)
+      .then((res: AxiosResponse) => {
+        context.commit('SET_TENANT_BS', res.data.data.getBsInfo.infos);
+        context.commit('SET_CURRENT_TENANT_NAME', res.data.data.getBsInfo.tenantName);
+      });
   },
 };
 

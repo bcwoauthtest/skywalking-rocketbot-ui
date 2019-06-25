@@ -81,7 +81,7 @@ const actions: ActionTree<any, any> = {
   MIXHANDLE_GET_OPTION(context: { commit: Commit, dispatch: Dispatch, state: State, getters: any }, params: any) {
     switch (params.compType) {
       case 'service':
-        return context.dispatch('GET_SERVICES', {duration: params.duration})
+        return context.dispatch('GET_SERVICES', {tenantId: params.tenantId, isAddress: '0', duration: params.duration})
           .then(() => context.dispatch('GET_SERVICE_ENDPOINTS'))
           .then(() => context.dispatch('GET_SERVICE_INSTANCES', {duration: params.duration}));
       case 'database':

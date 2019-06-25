@@ -19,11 +19,11 @@ import globalTemp from './global-template';
 import databaseTemp from './database-template';
 export default [
   {
-    name: 'Global',
+    name: '全局',
     children: globalTemp,
   },
   {
-    name: 'Database',
+    name: '数据库',
     children: databaseTemp,
   },
 ];

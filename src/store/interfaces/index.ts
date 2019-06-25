@@ -55,11 +55,15 @@ export interface Option {
   label?: string;
 }
 
-
 export interface Duration {
   start: Date;
   end: Date;
   step: string;
+}
+
+export interface BsDuration {
+  start: string;
+  end: string;
 }
 export interface DurationTime {
   start: string;

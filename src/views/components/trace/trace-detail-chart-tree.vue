@@ -33,7 +33,7 @@
       <rk-sidebox :show.sync="showDetail" :title="$t('spanInfo')">
       <div class="rk-trace-detail">
         <h5 class="mb-15">{{$t('tags')}}.</h5>
-        <div class="mb-10 clear"><span class="g-sm-4 grey">{{$t('endpoint')}}:</span><span class="g-sm-8 wba">{{this.currentSpan.label}}</span></div>
+        <div class="mb-10 clear"><span class="g-sm-4 grey">{{$t('endPointTag')}}:</span><span class="g-sm-8 wba">{{this.currentSpan.label}}</span></div>
         <div class="mb-10 clear"><span class="g-sm-4 grey">{{$t('spanType')}}:</span><span class="g-sm-8 wba">{{this.currentSpan.type}}</span></div>
         <div class="mb-10 clear"><span class="g-sm-4 grey">{{$t('component')}}:</span><span class="g-sm-8 wba">{{this.currentSpan.component}}</span></div>
         <div class="mb-10 clear"><span class="g-sm-4 grey">Peer:</span><span class="g-sm-8 wba">{{this.currentSpan.peer||'No Peer'}}</span></div>
@@ -43,12 +43,12 @@
         <div v-for="(i, index) in this.currentSpan.logs" :key="index">
           <div class="mb-10 sm"><span class="mr-10">{{$t('time')}}:</span><span class="grey">{{i.time | dateformat}}</span></div>
           <div class="mb-15 clear" v-for="(_i, _index) in i.data" :key="_index">
-            <div class="mb-10">{{_i.key}}:</div><pre class="g-sm-8 mt-0 mb-0 sm" style="overflow:auto">{{_i.value}}</pre>
+            <div class="mb-10">{{_i.key}}:</div><pre class="g-sm-12 mt-0 mb-0 sm" style="overflow:auto">{{_i.value}}</pre>
           </div>
         </div>
       </div>
     </rk-sidebox>
-    <div class="trace-tree" style="height:100%">
+    <div class="trace-tree">
       <div class="trace-tree-inner" ref="traceTree"></div>
     </div>
   </div>
@@ -84,7 +84,9 @@ export default {
   methods: {
     handleSelectSpan(i) {
       this.currentSpan = i.data;
-      this.showDetail = true;
+      if (i.data.label !== 'TRACE_ROOT') {
+        this.showDetail = true;
+      }
     },
     traverseTree(node, spanId, segmentId, data){
       if (!node) return;

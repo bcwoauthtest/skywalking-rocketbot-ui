@@ -80,8 +80,7 @@ export default class Comps extends Vue {
     if (document.execCommand('Copy')) {
         document.execCommand('Copy');
     }
-    input.remove();
-    Vue.prototype.$noty.success('Copied!', {timeout: 500});
+    input.style.display = 'none';
   }
   private handleApply() {
     const r = confirm('');

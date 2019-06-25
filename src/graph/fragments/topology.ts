@@ -74,14 +74,91 @@ export const TopoClientInfo = {
 `};
 
 export const Topo = {
-  variable: '$duration: Duration!',
+  variable: '$tenantId: String, $bsIds: String!, $tsIds: String, $nodeIds: String, $duration: Duration!',
   query: `
+  topo: getGlobalTopology(tenantId: $tenantId, bsIds: $bsIds, tsIds: $tsIds, nodeIds: $nodeIds, duration: $duration) {
+    nodes {
+      id
+      name
+      userDefName
+      type
+      userDefNodeType
+      isReal
+      host
+      bsId
+      tsId
+      nodeId
+      ciId
+      hostIP
+    }
+    calls {
+      id
+      source
+      target
+      callType
+      detectPoint
+    }
+  }`};
+
+export const TopoInfo = {
+    variable: '$duration: Duration!',
+    query: `
   topo: getGlobalTopology(duration: $duration) {
     nodes {
       id
       name
+      userDefName
       type
+      userDefNodeType
       isReal
+      host
+      hostIP
+    }
+    calls {
+      id
+      source
+      target
+      callType
+      detectPoint
+    }
+  }`};
+
+export const ServiceTopo = {
+    variable: '$serviceId: ID!, $duration: Duration!',
+    query: `
+  topo: getServiceTopology(serviceId: $serviceId, duration: $duration) {
+    nodes {
+      id
+      name
+      userDefName
+      type
+      userDefNodeType
+      isReal
+      host
+      hostIP
+    }
+    calls {
+      id
+      source
+      target
+      callType
+      detectPoint
+    }
+  }`};
+
+export const ServicesTopo = {
+  variable: '$serviceIds: [Int!]!, $duration: Duration!',
+  query: `
+  topo: getServicesTopology(serviceIds: $serviceIds, duration: $duration) {
+    nodes {
+      id
+      name
+      userDefName
+      type
+      userDefNodeType
+      isReal
+      host
+      hostIP
     }
     calls {
       id
@@ -164,5 +241,224 @@ export const TopoClientMetric = {
     values {
       id
       value
+    }
+  }`};
+
+export const UpdateDefName = {
+  variable: '$serviceSequence: String!, $userDefineNodeName: String!',
+  query: `
+  setUserDefineNodeName(serviceSequence: $serviceSequence, userDefineNodeName: $userDefineNodeName) {
+    status
+  }`};
+
+export const UpdateDefBSName = {
+  variable: '$bsId: String!, $userDefineBsNodeName: String!',
+  query: `
+  setUserDefineBsNodeName(bsId: $bsId, userDefineBsNodeName: $userDefineBsNodeName) {
+    status
+  }`};
+
+export const UpdateDefTSName = {
+  variable: '$tsId: String!, $userDefineTsNodeName: String!',
+  query: `
+  setUserDefineTsNodeName(tsId: $tsId, userDefineTsNodeName: $userDefineTsNodeName) {
+    status
+  }`};
+
+export const UpdateDefNodeName = {
+  variable: '$nodeId: String!, $userDefineNodeNodeName: String!',
+  query: `
+  setUserDefineNodeNodeName(nodeId: $nodeId, userDefineNodeNodeName: $userDefineNodeNodeName) {
+    status
+  }`};
+
+export const UpdateDefNodeType = {
+  variable: '$serviceSequence: String!, $userDefineNodeType: String!',
+  query: `
+  setUserDefineNodeType(serviceSequence: $serviceSequence, userDefineNodeType: $userDefineNodeType) {
+    status
+  }`};
+
+export const WrappedBsTopo = {
+  variable: '$tenantId: String, $bsIds: String!, $duration: Duration!',
+  query: `
+  topo: getTopologyWrappedByBs(tenantId: $tenantId, bsIds: $bsIds, duration: $duration) {
+    nodes {
+      id
+      name
+      userDefName
+    }
+    calls {
+      id
+      source
+      target
+    }
+    metricResult{
+      sla{
+        values {
+          id
+          value
+        }
+      }
+      nodeCpm{
+        values {
+          id
+          value
+        }
+      }
+      nodeLatency{
+        values {
+          id
+          value
+        }
+      }
+      cpmS{
+        values {
+          id
+          value
+        }
+      }
+      latencyS{
+        values {
+          id
+          value
+        }
+      }
+      cpmC{
+        values {
+          id
+          value
+        }
+      }
+      latencyC{
+        values {
+          id
+          value
+        }
+      }
+    }
+  }`};
+
+export const WrappedTsTopo = {
+  variable: '$tenantId: String, $bsIds: String!, $duration: Duration!',
+  query: `
+  topo: getTopologyWrappedByTs(tenantId: $tenantId, bsIds: $bsIds, duration: $duration) {
+    nodes {
+      id
+      name
+      userDefName
+      type
+      bsName
+    }
+    calls {
+      id
+      source
+      target
+    }
+    metricResult{
+      sla{
+        values {
+          id
+          value
+        }
+      }
+      nodeCpm{
+        values {
+          id
+          value
+        }
+      }
+      nodeLatency{
+        values {
+          id
+          value
+        }
+      }
+      cpmS{
+        values {
+          id
+          value
+        }
+      }
+      latencyS{
+        values {
+          id
+          value
+        }
+      }
+      cpmC{
+        values {
+          id
+          value
+        }
+      }
+      latencyC{
+        values {
+          id
+          value
+        }
+      }
+    }
+  }`};
+
+export const WrappedNodeTopo = {
+  variable: '$tenantId: String, $bsIds: String!, $tsIds: String, $duration: Duration!',
+  query: `
+  topo: getTopologyWrappedByNode(tenantId: $tenantId, bsIds: $bsIds, tsIds: $tsIds, duration: $duration) {
+    nodes {
+      id
+      name
+      userDefName
+      type
+      bsName
+    }
+    calls {
+      id
+      source
+      target
+    }
+    metricResult{
+      sla{
+        values {
+          id
+          value
+        }
+      }
+      nodeCpm{
+        values {
+          id
+          value
+        }
+      }
+      nodeLatency{
+        values {
+          id
+          value
+        }
+      }
+      cpmS{
+        values {
+          id
+          value
+        }
+      }
+      latencyS{
+        values {
+          id
+          value
+        }
+      }
+      cpmC{
+        values {
+          id
+          value
+        }
+      }
+      latencyC{
+        values {
+          id
+          value
+        }
+      }
     }
   }`};

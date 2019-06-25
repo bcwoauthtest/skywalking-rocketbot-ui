@@ -50,7 +50,7 @@ if (!saveLang) {
 }
 
 const i18n = new VueI18n({
-  // locale: 'en-us',
+  // locale: 'zh-CN',
   locale: language,
   messages: {
     zh,

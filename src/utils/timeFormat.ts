@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { Duration } from '@/store/interfaces';
+import {BsDuration, Duration} from '@/store/interfaces';
 
 const timeFormat = (time: Date[]): Duration => {
   let step = 'MINUTE';

@@ -22,6 +22,7 @@
     <ToolNav :rocketGlobal="rocketGlobal" :rocketComps="rocketComps"/>
     <DashboardInner  v-if="isRouterAlive" :rocketGlobal="rocketGlobal" :stateDashboard='stateDashboard' :rocketComps="rocketComps"/>
     <DashboardComp v-if="rocketGlobal.edit" :compType="compType" :rocketComps="rocketComps"/>
+    <RkFooter ref="footer"/>
   </div>
 </template>
 
@@ -66,7 +67,7 @@ export default class Dashboard extends Vue {
     this.MIXHANDLE_GET_DASHBOARD({compType: this.compType, duration: this.durationTime});
   }
   private handleOption() {
-    return this.MIXHANDLE_GET_OPTION({compType: this.compType, duration: this.durationTime})
+    return this.MIXHANDLE_GET_OPTION({tenantId: this.rocketGlobal.currentTenant, compType: this.compType, duration: this.durationTime})
       .then(() => {
         this.handleRefresh();
       });
@@ -91,7 +92,6 @@ export default class Dashboard extends Vue {
 .dashboard-container{
   overflow: auto;
   padding:20px 15px;
-  height: 100%;
   flex-grow: 1;
 }
 </style>

@@ -70,9 +70,18 @@ export default class TraceMap {
     const that = this;
     this.root.children.forEach(collapse);
     this.topSlowMax = this.topSlow.sort((a,b) => b - a)[0];
-    this.topSlowMin = this.topSlow.sort((a,b) => b - a)[4];
+    if (this.topSlow.length >= 5) {
+      this.topSlowMin = this.topSlow.sort((a,b) => b - a)[4];
+    } else {
+      this.topSlowMin = this.topSlow.sort((a,b) => b - a)[this.topSlow.length - 1];
+    }
+
     this.topChildMax = this.topChild.sort((a,b) => b - a)[0];
-    this.topChildMin = this.topChild.sort((a,b) => b - a)[4];
+    if (this.topChild.length >= 5) {
+      this.topChildMin = this.topChild.sort((a,b) => b - a)[4];
+    } else {
+      this.topChildMin = this.topChild.sort((a,b) => b - a)[this.topChild.length - 1];
+    }
     this.update(this.root);
     // Collapse the node and all it's children
     function collapse(d) {
@@ -86,6 +95,10 @@ export default class TraceMap {
         that.topChild.push(d.children.length);
         d.childrenLength = d.children.length;
         d.children.forEach(collapse)
+      } else {
+        let dur = d.data.endTime - d.data.startTime;
+        d.dur = dur < 0 ? 0 : dur;
+        that.topSlow.push(dur);
       }
     }
   }

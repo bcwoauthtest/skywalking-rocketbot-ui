@@ -87,7 +87,8 @@ export default class TopoChart extends Vue {
           symbol: 'none',
           barMaxWidth: 5,
           lineStyle: {
-            width: 1,
+            width: 2,
+            color: '#3f96e3ff',
           },
         },
       ],

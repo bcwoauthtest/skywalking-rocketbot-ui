@@ -15,7 +15,7 @@
  * limitations under the License.
  */
 
-import { Services, Endpoints, Instances, Database } from '../fragments/option';
+import { Services, Endpoints, Instances, Database, BsInfos, CiServices } from '../fragments/option';
 
 export const queryServices =
   `query queryServices(${Services.variable}) {${Services.query}}`;
@@ -28,3 +28,9 @@ export const queryEndpoints =
 
 export const queryInstances =
   `query queryInstances(${Instances.variable}) {${Instances.query}}`;
+
+export const queryBsInfos =
+  `query queryBsInfo(${BsInfos.variable}) {${BsInfos.query}}`;
+
+export const queryCiServices =
+  `query queryCiServices(${CiServices.variable}) {${CiServices.query}}`;

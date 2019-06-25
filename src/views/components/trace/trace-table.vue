@@ -24,10 +24,13 @@
           <option value="BY_DURATION">{{this.$t('duration')}}</option>
         </select>
       </div>
-      <div class="rk-trace-t-loading" v-show="loading">
+      <div class="rk-trace-t-loading" v-show="rocketTrace.traceQueryState">
         <svg class="icon loading">
           <use xlink:href="#spinner"></use>
         </svg>
+      </div>
+      <div class="rk-trace-t-loading" v-show="!rocketTrace.traceList.length">
+        未查到相关链路信息
       </div>
       <div class="rk-trace-t-wrapper scroll_hide">
         <table class="rk-trace-t">
@@ -58,7 +61,6 @@ export default class Home extends Vue {
   @Mutation('rocketTrace/SET_CURRENT_TRACE') private SET_CURRENT_TRACE: any;
   @Action('rocketTrace/GET_TRACELIST') private GET_TRACELIST: any;
   @Action('rocketTrace/GET_TRACE_SPANS') private GET_TRACE_SPANS: any;
-  private loading: boolean = false;
   private selectTrace(i: any) {
     this.SET_CURRENT_TRACE(i);
     if (i.traceIds.length) {
@@ -71,11 +73,8 @@ export default class Home extends Vue {
     this.GET_TRACELIST();
   }
   private page(p: number) {
-    this.loading = true;
     this.SET_TRACE_FORM_ITEM({type: 'paging', data: { pageNum: p, pageSize: 15, needTotal: true}});
-    this.GET_TRACELIST().then(() => {
-      this.loading = false;
-    });
+    this.GET_TRACELIST();
   }
 }
 </script>

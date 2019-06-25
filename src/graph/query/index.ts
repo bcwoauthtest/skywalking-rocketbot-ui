@@ -20,10 +20,12 @@ import * as dashboard from './dashboard';
 import * as trace from './trace';
 import * as topology from './topology';
 import * as alarm from './alarm';
+import * as log from './log';
 export default {
   ...option,
   ...dashboard,
   ...trace,
   ...topology,
   ...alarm,
+  ...log,
 };

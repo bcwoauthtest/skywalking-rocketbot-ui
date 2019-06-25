@@ -23,6 +23,7 @@ import Dashboard from './views/containers/dashboard.vue';
 import Trace from './views/containers/trace.vue';
 import Topology from './views/containers/topology.vue';
 import Alarm from './views/containers/alarm.vue';
+import Log from './views/containers/log.vue';
 
 Vue.use(Router);
 const w: any = window;
@@ -43,20 +44,29 @@ const router = new Router({
       component: Index,
       children: [
         {
-          path: '',
+          path: 'dashboard/:tenantId',
           component: Dashboard,
+          name: 'dashboard',
         },
         {
-          path: 'trace',
+          path: 'trace/:tenantId',
           component: Trace,
+          name: 'trace',
         },
         {
-          path: 'topology',
-          component: Topology,
+          path: 'log/:tenantId',
+          component: Log,
+          name: 'log',
         },
         {
-          path: 'alarm',
+          path: 'alarm/:tenantId',
           component: Alarm,
+          name: 'alarm',
+        },
+        {
+          path: ':tenantId',
+          component: Topology,
+          name: 'topo',
         },
       ],
     },
@@ -64,6 +74,8 @@ const router = new Router({
 });
 
 router.beforeEach((to, from, next) => {
+  window.localStorage.setItem('version', '6');
+  window.localStorage.setItem('skywalking-authority', 'admin');
   const token = window.localStorage.getItem('skywalking-authority');
   if (w.axiosCancel.length !== 0) {
     for (const func of  w.axiosCancel) {
@@ -71,15 +83,15 @@ router.beforeEach((to, from, next) => {
     }
     w.axiosCancel = [];
   }
-  if (to.meta.login && (token === null || token === 'guest')) {
+  /*if (to.meta.login && (token === null || token === 'guest')) {
     next();
   } else if (token === null || token === 'guest') {
     next('/login');
   } else if (to.meta.login) {
     next(from.path);
-  } else {
-    next();
-  }
+  } else {*/
+  next();
+  /*}*/
 });
 
 export default router;

@@ -37,7 +37,7 @@ const initState: State = {
   current: 0,
   group: 0,
   tree: [{
-    name: 'Service Dashboard',
+    name: '应用大盘',
     type: 'service',
     query:  {
       service: {},
@@ -46,7 +46,7 @@ const initState: State = {
     },
     children: groupServiceTemp,
   }, {
-    name: 'Database Dashboard',
+    name: '数据库大盘',
     type: 'database',
     query:  {
       service: {},

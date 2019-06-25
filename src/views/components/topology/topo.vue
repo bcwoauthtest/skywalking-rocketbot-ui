@@ -16,20 +16,20 @@
  */
 
 <template>
-  <div class="micro-topo-chart"></div>
+  <div class="micro-topo-chart" :style="height">
+   <div class="micro-topo-container" ref="topo" style="width: 100%;height: 100%;"></div>
+  </div>
 </template>
 <script lang="js">
 import * as d3 from 'd3';
-import d3tip from 'd3-tip';
-/* tslint:disable */
-const diagonal = d3.linkHorizontal()
-  .x(function (d) { return d.x })
-  .y(function (d) { return d.y });
-const diagonalvertical = d3.linkVertical()
-  .x(function (d) { return d.x })
-  .y(function (d) { return d.y });
+import cytoscape from 'cytoscape';
+import dagre from 'cytoscape-dagre';
+import cyCanvas from 'cytoscape-canvas';
 
-export default {
+cytoscape.use(dagre);
+cytoscape.use(cyCanvas);
+
+export default{
   props: {
     datas: {
       type: Object,
@@ -40,374 +40,589 @@ export default {
         };
       },
     },
+    coloringThreshold: {
+        type: String,
+        default() {
+            return '100,500';
+        },
+    },
   },
   data() {
     return {
-      LOCAL: require('./assets/Local2.png'),
-      CUBE: require('./assets/cube22.png'),
-      CUBEERROR: require('./assets/cube21.png'),
-      USER: require('./assets/USER.png'),
-      UNKNOWN: require('./assets/UNKNOWN.png'),
-      UNKNOWNCLOUD: require('./assets/UNKNOWN_CLOUD.png'),
-      UNDEFINED: require('./assets/UNDEFINED.png'),
-      KAFKA: require('./assets/KAFKALOGO.png'),
-      KAFKACONSUMER: require('./assets/KAFKALOGO.png'),
-      H2:require('./assets/H2.png'),
-      REDIS:require('./assets/REDIS.png'),
-      TOMCAT: require('./assets/TOMCAT.png'),
-      HTTPCLIENT: require('./assets/HTTPCLIENT.png'),
-      DUBBO: require('./assets/DUBBO.png'),
-      MOTAN: require('./assets/MOTAN.png'),
-      RESIN: require('./assets/RESIN.png'),
-      OKHTTP: require('./assets/OKHTTP.png'),
-      SPRINGMVC: require('./assets/SPRINGMVC.png'),
-      STRUTS2: require('./assets/STRUTS2.png'),
-      NUTZMVC: require('./assets/SPRINGMVC.png'),
-      NUTZHTTP: require('./assets/HTTPCLIENT.png'),
-      JETTY:require('./assets/JETTY.png'),
-      JETTYSERVER: require('./assets/JETTYSERVER.png'),
-      GRPC: require('./assets/GRPC.png'),
-      ORACLE: require('./assets/ORACLE.png'),
-      MYSQL: require('./assets/MYSQL.png'),
-      MYSQLGROUP: require('./assets/MYSQL.png'),
-      MSSQLSERVER: require('./assets/MYSQL.png'),
-      MSSQLSERVERGROUP: require('./assets/MYSQL.png'),
-      MONGODB: require('./assets/MONGODB.png'),
-      MONGODBGROUP: require('./assets/MONGODB.png'),
-      ACTIVEMQ: require('./assets/ACTIVEMQ.png'),
-      ELASTICSEARCH: require('./assets/ELASTICSEARCH.png'),
-      FEIGNDEFAULTHTTP: require('./assets/FEIGNDEFAULTHTTP.png'),
-      HPROSE: require('./assets/HPROSE.png'),
-      HPROSE: require('./assets/POSTGRESQL.png'),
-      RESIN: require('./assets/RESIN.png'),
-      RABBITMQ: require('./assets/RABBITMQ.png'),
-      SOFARPC: require('./assets/SOFARPC.png'),
-      ROCKETMQ: require('./assets/ROCKETMQ.png'),
-      HTTP: require('./assets/HTTPCLIENT.png'),
-      width: 600,
-      height: 600,
-      force: '',
-      svg: '',
-      graph: '',
-      link: '',
-      node: '',
-      zoom: '',
+        USER: require('./assets/USER.png'),
+        UNKNOWN: require('./assets/UNKNOWN.png'),
+        UNKNOWN_CLOUD: require('./assets/UNKNOWN_CLOUD.png'),
+        USER1: require('./assets/USER1.png'),
+        UNDEFINED: require('./assets/UNDEFINED.png'),
+        KAFKACONSUMER: require('./assets/kafka.png'),
+        KAFKA: require('./assets/kafka.png'),
+        H2: require('./assets/DATABASE.png'),
+        REDIS: require('./assets/REDIS.png'),
+        TOMCAT: require('./assets/TOMCAT.png'),
+        HTTPCLIENT: require('./assets/www(1).png'),
+        DUBBO: require('./assets/DUBBO_PROVIDER.png'),
+        MOTAN: require('./assets/DATABASE.png'),
+        RESIN: require('./assets/RESIN.png'),
+        FEIGN: require('./assets/www(1).png'),
+        OKHTTP: require('./assets/www(1).png'),
+        SPRINGRESTTEMPLATE: require('./assets/www(1).png'),
+        SPRINGMVC: require('./assets/SPRING_BOOT.png'),
+        STRUTS2: require('./assets/DATABASE.png'),
+        NUTZMVC: require('./assets/SPRING_BOOT.png'),
+        NUTZHTTP: require('./assets/www(1).png'),
+        JETTYCLIENT: require('./assets/www(1).png'),
+        JETTYSERVER: require('./assets/SPRING_BOOT.png'),
+        SHARDINGJDBC: require('./assets/ShardingJDBC.png'),
+        GRPC: require('./assets/GRPC.png'),
+        ELASTICJOB: require('./assets/ElasticJob.png'),
+        HTTPASYNCCLIENT: require('./assets/www(1).png'),
+        DUBBO_PROVIDER: require('./assets/DUBBO_PROVIDER.png'),
+        DUBBO_PROVIDER_GROUP: require('./assets/DUBBO_PROVIDER_GROUP.png'),
+        ServiceComb: require('./assets/ORACLE_GROUP.png'),
+        ORACLE: require('./assets/ORACLE.png'),
+        NG: require('./assets/ng.png'),
+        NBASE: require('./assets/NBASE.png'),
+        NBASE_T: require('./assets/NBASE_T.png'),
+        NBASE_ARC: require('./assets/NBASE_ARC.png'),
+        NBASE_ARC_GROUP: require('./assets/NBASE_ARC_GROUP.png'),
+        MYSQL: require('./assets/MYSQL.png'),
+        MYSQL_GROUP: require('./assets/MYSQL.png'),
+        MSSQLSERVER: require('./assets/MSSQLSERVER.png'),
+        MSSQLSERVER_GROUP: require('./assets/MSSQLSERVER_GROUP.png'),
+        MONGODB: require('./assets/MONGODB.png'),
+        MONGODB_GROUP: require('./assets/MONGODB_GROUP.png'),
+        MEMCACHED: require('./assets/MEMCACHED.png'),
+        MARIADB: require('./assets/MARIADB.png'),
+        MARIADB_GROUP: require('./assets/MARIADB_GROUP.png'),
+        JETTY: require('./assets/JETTY.png'),
+        JBOSS: require('./assets/JBOSS.png'),
+        FILTER: require('./assets/filter.png'),
+        ETC: require('./assets/ETC.png'),
+        DUBBO_PROVIDER: require('./assets/DUBBO_PROVIDER.png'),
+        DUBBO_PROVIDER_GROUP: require('./assets/DUBBO_PROVIDER_GROUP.png'),
+        CUBRID: require('./assets/CUBRID.png'),
+        CUBRID_GROUP: require('./assets/CUBRID_GROUP.png'),
+        CLIENT: require('./assets/CLIENT.png'),
+        CASSANDRA: require('./assets/CASSANDRA.png'),
+        BLOC: require('./assets/BLOC.png'),
+        BACKEND: require('./assets/BACKEND.png'),
+        ARCUS: require('./assets/ARCUS.png'),
+        APACHE: require('./assets/APACHE.png'),
+        ACTIVEMQ: require('./assets/ACTIVEMQ.png'),
+        ACTIVEMQ_CLIENT: require('./assets/ACTIVEMQ.png'),
+        ACTIVEMQ_CLIENT_GROUP: require('./assets/ACTIVEMQ.png'),
+        ACTIVEMQCONSUMER: require('./assets/ACTIVEMQ.png'),
+        JAVAAPPLICATION: require('./assets/Java.png'),
+        NGINX: require('./assets/NginxDef.png'),
+        DB2: require('./assets/DB2.png'),
+        WEBSPHERE: require('./assets/websphere.png'),
+        IXBUS: require('./assets/iXBus.png'),
+        WEBLOGIC: require('./assets/weblogic.png'),
+        LATENCY_COLOR_RANGE: ['#339933', '#d4b106', '#cf1322'],
+        chartElements: [],
+        minLineWidth: 3,
+        maxLineWidth: 12,
+        borderWidthDef: 4,
+        highlightOutRadius: 26,
+        highlightInRadius: 22,
+        minZoomedFontSizeDef: '',
+        height: {
+          height: '',
+        },
     };
-  },
-  beforeDestroy() {
-    this.tip.hide({}, this);
-    window.removeEventListener('resize', this.resize);
-    d3.selectAll('.d3-tip-grey').remove();
-    // this.$store.commit('skywalking/setCurrentNode', []);
-  },
-  mounted() {
-    window.addEventListener('resize', this.resize);
-    this.tip = d3tip()
-      .attr('class', 'd3-tip-grey')
-      .offset([-8, 0])
-      .html(d => {
-        return `
-      <div class="mb-5"><span class="grey">${this.$t('callType')}: </span>${d.callType}</div>
-      <div class="mb-5"><span class="grey">${this.$t('cpm')}: </span>${d.cpm}</div>
-      <div class="mb-5"><span class="grey">${this.$t('detectPoint')}: </span>${this.$store.state.rocketTopo.mode?d.detectPoint:'CLIENT'}</div>
-      <div><span class="grey">${this.$t('latency')}: </span>${d.latency}</div>
-      `});
-    this.tipName = d3tip()
-      .attr('class', 'd3-tip-grey')
-      .offset([-8, 0])
-      .html(d => {
-        return `<div>${d.name}</div>`});
-    this.height = this.$el.clientHeight;
-    this.svg = d3
-      .select(this.$el)
-      .append('svg')
-      .style('display','block')
-      .attr('width', '100%')
-      .attr('height', this.height);
   },
   watch: {
     'datas.nodes': 'draw',
+    'coloringThreshold': 'changeLineColor',
+  },
+  created() {
+    this.hh();
   },
   methods: {
+    hh() {
+      this.height.height = window.innerHeight - 120 + 'px';
+    },
     draw() {
-      const codeId = this.datas.nodes.map(i => i.id);
+      const codeId = this.datas.nodes.map((i) => i.id);
       for (let i = 0; i < this.datas.calls.length; i += 1) {
-        const element = this.datas.calls[i];
-        if(codeId.indexOf(element.target) === -1 ) {
-          this.datas.calls[i].target = this.datas.calls[i].source;
+        const singleCall = this.datas.calls[i];
+        if (codeId.indexOf(singleCall.target) === -1 ) {
+            this.datas.calls[i].target = this.datas.calls[i].source;
         }
       }
-      this.svg.select('.graph').remove();
-      this.force = d3
-        .forceSimulation(this.datas.nodes)
-        .force('collide', d3.forceCollide().radius(() => 65))
-        .force('yPos', d3.forceY().strength(1))
-        .force('xPos', d3.forceX().strength(1))
-        .force('charge', d3.forceManyBody().strength(-520))
-        .force( 'link', d3.forceLink(this.datas.calls).id(d => d.id))
-        .force('center', d3.forceCenter(window.innerWidth / 2 + 100, this.height / 2))
-        .on('tick', this.tick)
-        .stop();
-      this.graph = this.svg.append('g').attr('class', 'graph');
-      this.svg.call(this.getZoomBehavior(this.graph));
-      this.graph.call(this.tip);
-      this.graph.call(this.tipName);
-      this.svg.on('click', (d, i) => {
-        event.stopPropagation();
-        event.preventDefault();
-        this.$store.commit('rocketTopo/SET_NODE', {});
-        this.$store.dispatch('rocketTopo/CLEAR_TOPO_INFO');
-        that.tip.hide({}, this);
-        this.toggleNode(this.node, d, false);
-        this.toggleLine(this.line, d, false);
-        this.toggleLine(this.lineNode, d, false);
-      });
-      this.defs = this.graph.append('defs');
-      this.arrowMarker = this.defs
-        .append('marker')
-        .attr('id', 'arrow')
-        .attr('markerUnits', 'strokeWidth')
-        .attr('markerWidth', '12')
-        .attr('markerHeight', '12')
-        .attr('viewBox', '0 0 12 12')
-        .attr('refX', '11')
-        .attr('refY', '6')
-        .attr('orient', 'auto');
-      const arrow_path = 'M2,2 L10,6 L2,10 L3,6 L2,2';
-      this.arrowMarker.append('path').attr('d', arrow_path).attr('fill', '#217EF2');
-      this.gnode = this.graph.append('g').selectAll('.node');
-      const that = this;
-      this.node = this.gnode.data(this.datas.nodes)
-        .enter()
-        .append('g')
-        .call(d3.drag()
-          .on('start', this.dragstart)
-          .on('drag', this.dragged)
-          .on('end', function(d, i) {
-           that.tipName.show(d, this);
-          }))
-        .on('mouseover', function(d, i) {
-           that.tipName.show(d, this);
-        })
-        .on('mouseout', function(d, i) {
-          that.tipName.hide(d, this);
-        })
-        .on('click', function(d, i) {
-          event.stopPropagation();
-          that.tip.hide({}, this);
-          that.node.attr('class', '');
-          d3.select(this).attr('class', 'node-active');
-          const copyD = JSON.parse(JSON.stringify(d));
-          delete copyD.x;
-          delete copyD.y;
-          delete copyD.vx;
-          delete copyD.vy;
-          delete copyD.fx;
-          delete copyD.fy;
-          delete copyD.index;
-          that.$store.commit('rocketTopo/SET_NODE', copyD);
-          that.toggleNode(that.node, d, true);
-          that.toggleLine(that.line, d, true);
-          that.toggleLine(that.lineNode, d, true);
-        });
-      this.node
-        .append('image')
-        .attr('width', 49)
-        .attr('height', 49)
-        .attr('x', 2)
-        .attr('y', 10)
-        .attr('style', 'cursor: move;')
-        .attr('xlink:href',d => {
-          const type = d.type;
-          if( d.sla < 100 ) {
-            return this.CUBEERROR;
-          }
-          return this.CUBE;
-        });
-      this.node
-        .append('image')
-        .attr('width',32)
-        .attr('height', 32)
-        .attr('x', 6)
-        .attr('y', -10)
-        .attr('style', 'opacity: 0.5;')
-        .attr('xlink:href',this.LOCAL);
-      this.node
-        .append('image')
-        .attr('width', 18)
-        .attr('height', 18)
-        .attr('x', 13)
-        .attr('y', -7)
-        .attr('xlink:href',d => {
-          if( !d.type || d.type === 'N/A') {
-            return this['UNDEFINED']
-          }
-          return this[d.type.toUpperCase().replace('-','')];
-        });
-      this.node
-        .append('text')
-        .attr('class', 'node-text')
-        .attr('text-anchor', 'middle')
-        .attr('x', 22)
-        .attr('y', 70)
-        .text(d => d.name.length >= 12 ? `${d.name.substring(0,12)}...`: d.name)
-      
-      this.glink = this.graph.append('g').selectAll('.link');
-      this.link = this.glink.data(this.datas.calls).enter();
-      this.line = this.link.append('path').attr('class', 'link')
-        .attr('stroke-dasharray', '13 7')
-        .attr('stroke', d => d.cpm ? '#217EF25f' : '#6a6d7777');
-      const handleSelectLine = function(d, i) {
-        that.tip.hide({}, this);
+      const compElements = this.transformData();
+      let layoutDirDef = 'LR';
+      let nodeWidthAndHeightDef = 40;
+      let nodeSepDef = 50;
+      let edgeSepDef = 10;
+      let rankSepDef = 80;
+      let labelFontSizeDef = 15;
+      let paddingDef = 30;
+      this.minZoomedFontSizeDef = '';
+      this.borderWidthDef = 4;
+      let borderWidth = 4;
+      let outRadiusDef  = 20;
+      let inRadiusDef = 18;
+      let minLengthDef = 3;
+      this.minLineWidth = 3;
+      this.maxLineWidth = 12;
+      this.highlightOutRadius = 26;
+      this.highlightInRadius = 22;
+      if (compElements.nodes.length > 50) {
+        layoutDirDef = 'TB';
+        nodeWidthAndHeightDef = 40;
+        nodeSepDef = 10;
+        rankSepDef = 20;
+        edgeSepDef = 4;
+        labelFontSizeDef = 15;
+        paddingDef = 50;
+        this.minZoomedFontSizeDef = '100px';
+        this.borderWidthDef = 4;
+        borderWidth = 4;
+        minLengthDef = 3;
+        this.minLineWidth = 3;
+        this.maxLineWidth = 12;
+        outRadiusDef = 20;
+        inRadiusDef = 18;
+        this.highlightOutRadius = 26;
+        this.highlightInRadius = 22;
+      } else if (compElements.nodes.length > 30) {
+        layoutDirDef = 'TB';
+        nodeWidthAndHeightDef = 40;
+        nodeSepDef = 30;
+        rankSepDef = 20;
+        edgeSepDef = 10;
+        labelFontSizeDef = 15;
+        paddingDef = 50;
+        this.minZoomedFontSizeDef = '100px';
+        this.borderWidthDef = 4;
+        borderWidth = 4;
+        minLengthDef = 3;
+        this.minLineWidth = 3;
+        this.maxLineWidth = 12;
+        outRadiusDef = 20;
+        inRadiusDef = 18;
+        this.highlightOutRadius = 26;
+        this.highlightInRadius = 22;
+      } else if (compElements.nodes.length >= 15) {
+          layoutDirDef = 'TB';
+          nodeWidthAndHeightDef = 40;
+          nodeSepDef = 30;
+          rankSepDef = 30;
+          edgeSepDef = 20;
+          labelFontSizeDef = 15;
+          paddingDef = 50;
+          this.minZoomedFontSizeDef = '100px';
+          this.borderWidthDef = 4;
+          borderWidth = 4;
+          minLengthDef = 2;
+          this.minLineWidth = 3;
+          this.maxLineWidth = 12;
+          outRadiusDef = 20;
+          inRadiusDef = 18;
+          this.highlightOutRadius = 26;
+          this.highlightInRadius = 22;
       }
-      this.lineNode = this.link.append('rect').attr('class', 'link-node cp')
-        .attr('width', 6)
-        .attr('height', 6)
-        .attr('rx', 3)
-        .attr('ry', 3)
-        .attr('fill', d => d.cpm ? '#217EF299' : '#6a6d7799')
-        .on('click', function(d, i) {
-          that.$store.commit('rocketTopo/SET_MODE', d.detectPoint === 'SERVER')
-          event.stopPropagation();
-          that.tip.hide({}, this);
-          that.tip.show(d, this);
-          that.$store.dispatch(that.$store.state.rocketTopo.mode ? 'rocketTopo/GET_TOPO_SERVICE_INFO' : 'rocketTopo/GET_TOPO_CLIENT_INFO', {id:d.id,duration: that.$store.getters.durationTime});
-          that.$store.commit('rocketTopo/SET_CALLBACK', function() {
-            that.tip.hide({}, this);
-            that.tip.show(d, this);
-            that.$store.dispatch(that.$store.state.rocketTopo.mode ? 'rocketTopo/GET_TOPO_SERVICE_INFO' : 'rocketTopo/GET_TOPO_CLIENT_INFO', {id:d.id,duration: that.$store.getters.durationTime});
-          })
+      this.chartElements = compElements;
+      this.cy = cytoscape({
+        container: this.$refs.topo,
+        zoom: 1,
+        maxZoom: 1,
+        boxSelectionEnabled: true,
+        wheelSensitivity: 0.2,
+        layout: {
+          animate: false,
+          minLen: minLengthDef,
+          name: 'dagre',
+          rankDir: layoutDirDef,
+          fit: true,
+          nodeDimensionsIncludeLabels: true,
+          padding: paddingDef,
+          nodeSep: nodeSepDef,
+          rankSep: rankSepDef,
+          edgeSep: edgeSepDef,
+        },
+        style: [],
+        elements: compElements,
+      });
+
+      this.cy.style().selector('node[?isReal]')
+        .css({
+          'width': nodeWidthAndHeightDef,
+          'height': nodeWidthAndHeightDef,
+          'text-valign': 'bottom',
+          'text-halign': 'center',
+          'font-family': 'Microsoft YaHei',
+          'content': 'data(displayName)',
+          'text-margin-y': 10,
+          // 'border-width': this.borderWidthDef,
+          'border-width': 0,
+          'font-size': labelFontSizeDef,
+          'border-color': '#40a9ff',
+          'background-image': (ele) => this.getNodeImg(ele),
+          'background-width': '70%',
+          'background-height': '70%',
+          'background-color': '#e6f7ff',
+          'min-zoomed-font-size': this.minZoomedFontSizeDef,
+        })
+        .update();
+
+      this.cy.style().selector('node[!isReal]')
+        .css({
+          'width': nodeWidthAndHeightDef,
+          'height': nodeWidthAndHeightDef,
+          'text-valign': 'bottom',
+          'text-halign': 'center',
+          'font-family': 'Microsoft YaHei',
+          'content': 'data(displayName)',
+          'text-margin-y': 10,
+          'border-width': 0,
+          'font-size': labelFontSizeDef,
+          'border-color': '#40a9ff',
+          'background-image': (ele) => this.getNodeImg(ele),
+          'background-width': '70%',
+          'background-height': '70%',
+          'background-color': '#e6f7ff',
+          'min-zoomed-font-size': this.minZoomedFontSizeDef,
+        })
+        .update();
+
+      this.drawLine();
+
+      const layer = this.cy.cyCanvas();
+      const canvas = layer.getCanvas();
+
+      this.cy.on('render cyCanvas.resize', function() {
+        const ctx = canvas.getContext('2d');
+        layer.resetTransform(ctx);
+        layer.clear(ctx);
+
+        layer.setTransform(ctx);
+
+        // Draw model elements
+        this.nodes().forEach( (node) => {
+          const pos = node.position();
+          layer.setTransform(ctx);
+          const colors = ['#cf1322', '#40a9ff'];
+          const nodeSla = node.data('sla');
+          let sla = 100;
+          if (nodeSla !== undefined) {
+            sla = nodeSla;
+          }
+
+          let outRadius = outRadiusDef;
+          if (sla !== 100) {
+              outRadius = outRadiusDef + borderWidth / 2;
+          }
+          const arc = d3.arc()
+            .outerRadius(outRadius)
+            .innerRadius(inRadiusDef)
+            .context(ctx);
+
+          const pie = d3.pie()
+            .sort(null);
+
+          ctx.translate(pos.x, pos.y);
+
+          const arcs = pie([100 - sla, sla]);
+
+          arcs.forEach((d, i) => {
+            ctx.beginPath();
+            arc(d);
+            ctx.fillStyle = colors[i];
+            ctx.fill();
+          });
         });
-      d3.timeout(() => {
-        for (
-          let i = 0,
-            n = Math.ceil(
-              Math.log(this.force.alphaMin()) /
-                Math.log(1 - this.force.alphaDecay())
-            );
-          i < n;
-          i += 1
-        ) {
-          this.force.tick();
-          this.tick();
+      });
+
+      this.cy.on('click', 'node', this.onClickNode);
+
+      this.cy.on('click', 'edge', this.onClickEdge);
+
+      this.cy.on('click', this.onClick);
+
+      if (layoutDirDef === 'TB') {
+        this.cy.on('mouseover', 'node', this.onMouseOverNode);
+        this.cy.on('mouseout', 'node', this.onMouseOutNode);
+      }
+    },
+    onClick(evt) {
+      const evtTarget = evt.target;
+      if (evtTarget === this.cy) {
+        this.$store.commit('rocketTopo/SET_NODE', {id: '', name: '', host: ''});
+        return;
+      }
+    },
+    onClickNode(evt) {
+      const node = evt.target;
+      if (node.data('type') === 'USER') {
+        this.$store.commit('rocketTopo/SET_NODE', {id: '', name: '', host: ''});
+        return;
+      }
+      for (const i in this.chartElements.nodes) {
+        if (node.data('id') === this.chartElements.nodes[i].data.id) {
+          this.$store.commit('rocketTopo/SET_NODE', this.chartElements.nodes[i].data);
+          break;
         }
+      }
+      this.$store.commit('rocketTopo/SET_TOPO_DETAIL_SHOW', true);
+      this.$store.commit('rocketTopo/SET_TOPO_EDIT_SHOW', false);
+    },
+    onMouseOverNode(evt) {
+      const node = evt.target;
+      node.style('min-zoomed-font-size', '0px');
+    },
+    onMouseOutNode(evt) {
+      const node = evt.target;
+      node.style('min-zoomed-font-size', '100px');
+    },
+    onClickEdge(evt) {
+      const edge = evt.target;
+      for (const i in this.datas.calls) {
+        if (edge.data('id') === this.datas.calls[i].id) {
+          this.$store.commit('rocketTopo/SET_NODE', this.datas.calls[i]);
+          if (edge.data('detectPoint') === 'CLIENT') {
+            this.$store.commit('rocketTopo/SET_MODE', false);
+          } else {
+            this.$store.commit('rocketTopo/SET_MODE', true);
+          }
+          this.$store.dispatch(this.$store.state.rocketTopo.mode ?
+            'rocketTopo/GET_TOPO_SERVICE_INFO' : 'rocketTopo/GET_TOPO_CLIENT_INFO',
+            {id: edge.data('id'), duration: this.$store.getters.durationTime});
+          this.$store.commit('rocketTopo/SET_CALLBACK', function() {
+            this.$store.dispatch(this.$store.state.rocketTopo.mode ?
+              'rocketTopo/GET_TOPO_SERVICE_INFO' : 'rocketTopo/GET_TOPO_CLIENT_INFO',
+              {id: edge.data('id'), duration: this.$store.getters.durationTime});
+          });
+          break;
+        }
+      }
+      this.$store.commit('rocketTopo/SET_TOPO_DETAIL_SHOW', true);
+    },
+    transformData() {
+      const elements =  {
+        nodes: this.datas.nodes.map((node) => ({ data: node })),
+        edges: this.datas.calls.filter((call) => (this.datas.nodes.findIndex((node) => node.id === call.source) > -1
+          && this.datas.nodes.findIndex((node) => node.id === call.target) > -1))
+          .map((call) => ({ data: { ...call } })),
+      };
+      const nodeWithHost = this.formatDefNodeData(this.formatNodeData(elements.nodes));
+      return {
+        edges: elements.edges,
+        nodes: nodeWithHost,
+      };
+      /*const eleWithNewUsers = this.supplyUserNode(elements.edges);*/
+      /*return {
+        edges: elements.edges.filter((_) => !_.data || !(_.data.source === '8' || _.data.target === '8')),
+        nodes: nodeWithHost.filter((_) => !_.data || _.data.id !== '8'),
+      };*/
+      /*return elements;*/
+    },
+    formatNodeData(nodes) {
+      return nodes.map((_) => {
+        const nodeName = _.data.name.split('@');
+        _.data.displayName = _.data.name;
+        if (_.data.host === 'null') {
+          _.data.host = '';
+        }
+        // if (_.data.userDefName) {
+        //   const nodeDefName = _.data.userDefName.split('@');
+        //   _.data.displayName = _.data.userDefName;
+        //   if (nodeDefName.length === 2) {
+        //       _.data.displayName = nodeDefName[0];
+        //       // _.data.userDefHost = nodeDefName[1];
+        //   } else {
+        //       // _.data.userDefHost = '';
+        //   }
+        // }
+        if (nodeName.length === 2) {
+            _.data.displayName = nodeName[0];
+        }
+        //   _.data.name = nodeName[0];
+        //   // _.data.host = nodeName[1];
+        //   return {
+        //       data: {
+        //           ..._.data,
+        //           // host: nodeName[1],
+        //       },
+        //   };
+        // }
+        // _.data.host = '';
+        return {
+          data: {
+            ..._.data,
+            // host: nodeName[1],
+          },
+        };
       });
     },
-    isLinkNode(currNode, node) {
-    if (currNode.id === node.id) {
-        return true;
-    }
-    return this.datas.calls.filter(i => 
-      (i.source.id === currNode.id || i.target.id === currNode.id) &&
-      (i.source.id === node.id || i.target.id === node.id)
-    ).length;
-  },
-    toggleNode(nodeCircle, currNode, isHover) {
-    if (isHover) {
-        // 提升节点层级 
-      nodeCircle.sort((a, b) => a.id === currNode.id ? 1 : -1);
-      nodeCircle
-          .style('opacity', .2)
-          .filter(node => this.isLinkNode(currNode, node))
-          .style('opacity', 1);
-    } else {
-        nodeCircle.style('opacity', 1);
-    }
-},
-toggleLine(linkLine, currNode, isHover) {
-  if (isHover) {
-    linkLine
-      .style('opacity', .05)
-      .style('animation', 'none')
-      .filter(link => this.isLinkLine(currNode, link))
-      .style('opacity', 1)
-      .style('animation', 'dash 1s linear infinite');
-      // .classed('link-active', true);
-    } else {
-      linkLine
-        .style('opacity', 1)
-        .style('animation', 'dash 1s linear infinite');
-        // .classed('link-active', false);
-    }
-  },
-isLinkLine(node, link) {
-    return link.source.id == node.id || link.target.id == node.id;
-},
-toggleLineText(lineText, currNode, isHover) {
-  if (isHover) {
-    lineText
-      .style('fill-opacity', link => this.isLinkLine(currNode, link) ? 1.0 : 0.0);
-      } else {
-      lineText
-      .style('fill-opacity', '1.0');
-    }
-  },
-    toggleMarker(marker, currNode, isHover) {
-      if (isHover) {
-        marker.filter(link => this.isLinkLine(currNode, link))
-          .style('transform', 'scale(1.5)');
-      } else {
-        marker
-          .attr('refX', nodeConf.radius.Company)
-          .style('transform', 'scale(1)');
-      }
-    },
-    resize() {
-      this.svg.attr('height', document.body.clientHeight - 50);
-    },
-    tick() {
-      this.line
-        .attr('d', d => `M${d.source.x} ${d.source.y} Q ${(d.source.x + d.target.x)/2} ${(d.target.y + d.source.y)/2 - 80} ${d.target.x} ${d.target.y}`);
-      this.lineNode.attr('transform', d => `translate(${(d.source.x + d.target.x)/2 - 3},${(d.target.y + d.source.y)/2 - 43})`);
-      // this.linkText.attr('transform',d =>`translate(${(d.source.x + d.target.x) / 2},${(d.source.y + d.target.y) / 2})`);
-      this.node.attr('transform', d => `translate(${d.x -  22},${d.y - 22})`);
-    },
-    getZoomBehavior(g) {
-      const that = this;
-      return d3
-        .zoom()
-        .scaleExtent([0.3, 10])
-        .on('zoom', () => {
-          that.tip.hide({}, this);
-          that.tipName.hide({}, this);
-          g.attr(
-            'transform',
-            `translate(${d3.event.transform.x},${d3.event.transform.y})scale(${
-              d3.event.transform.k
-            })`
-          );
-        });
-    },
-    dragstart(d) {
-      const that = this;
-      that.tipName.hide({}, this);
-      this.node._groups[0].forEach(d => {
-        d.__data__.fx = d.__data__.x;
-        d.__data__.fy = d.__data__.y;
+    formatDefNodeData(nodes) {
+      return nodes.map((_) => {
+        if (_.data.userDefName !== undefined && _.data.userDefName !== '') {
+          _.data.displayName = _.data.userDefName;
+        }
+        // if ((_.data.host === undefined || _.data.host === '' )
+        //     &&  _.data.userDefHost !== undefined && _.data.userDefHost !== '') {
+        //   _.data.host = _.data.userDefHost;
+        // }
+        if (_.data.userDefNodeType !== undefined && _.data.userDefNodeType !== '') {
+          _.data.type = _.data.userDefNodeType;
+        }
+        return _;
       });
-      if (!d3.event.active) {
-        this.force.alphaTarget(0.01).restart();
-      }
-      d3.event.sourceEvent.stopPropagation();
     },
-    dragged(d) {
-      const that = this;
-      that.tipName.hide({}, this);
-      d.fx = d3.event.x;
-      d.fy = d3.event.y;
+    supplyUserNode(edges) {
+      const nodes = [];
+      return {
+        nodes,
+        edges: edges.map((_) => {
+          if (_.data.source !== '1') {
+            return {
+              data: {
+                ..._.data,
+                dataId: _.data.id,
+              },
+            };
+          }
+          const newId = `USER-${_.data.target}`;
+          nodes.push({
+            data: {
+              id: newId,
+              name: 'User',
+              type: 'USER',
+              isReal: false,
+            },
+          });
+          return {
+            data: {
+              ..._.data,
+              source: newId,
+              dataId: _.data.id,
+              id: `${newId}-${_.data.target}`,
+            },
+          };
+        }),
+      };
     },
-    dragended() {
-      if (!d3.event.active) {
-        this.force.alphaTarget(0);
+    cpmFunc(edge) {
+      if (this.datas.calls.length < 1) {
+        return this.maxLineWidth;
       }
+      const valueData = this.datas.calls.map((_) => _.cpm);
+      const max = Math.max(...valueData);
+      const min = Math.min(...valueData);
+      const range = max - min;
+
+      if (range < 1) {
+        return this.minLineWidth;
+      }
+      const value = edge.data('cpm');
+      let v = min;
+      if (value) {
+        v = value;
+      }
+      const r = Math.round((v - min) * (this.maxLineWidth - this.minLineWidth) / range + this.minLineWidth);
+      if (r < this.minLineWidth) {
+        return this.minLineWidth;
+      }
+      return r;
+    },
+    getNodeImg(node) {
+      const type = node.data('type');
+      if ( !type || type === 'N/A') {
+        return 'url(' + this.UNKNOWN_CLOUD + ')';
+      }
+      if (!this[type.toUpperCase().replace('-', '')]) {
+        return 'url(' + this.UNKNOWN_CLOUD + ')';
+      }
+      return 'url(' + this[type.toUpperCase().replace('-', '')] + ')';
+    },
+    lineColor(edge, colorRange) {
+      const value = edge.data('latency');
+      if (!value) {
+        return '#339933';
+      }
+      const range = colorRange.find((_) => value >= _.range[0] && value < _.range[1]);
+      return range ? range.color : '#339933';
+    },
+    changeLineColor() {
+      this.drawLine();
+    },
+    highlightNode(applicationId) {
+      const highlightNode = this.cy.nodes().filter('[id="' + applicationId + '"]');
+      const borderWidthCur = this.borderWidthDef;
+      const minZoomedFontSizeCur = this.minZoomedFontSizeDef;
+      this.cy.center(highlightNode);
+      highlightNode.style({'min-zoomed-font-size': '0px'});
+      highlightNode.animate({
+        style: { borderColor: 'red', borderWidth: borderWidthCur * 3 },
+        duration: 1000,
+        complete() {
+          highlightNode.style({
+            borderColor: '#40a9ff',
+            borderWidth: 0,
+          });
+        },
+      });
+      highlightNode.animate({
+        style: { borderColor: 'red', borderWidth: borderWidthCur * 3 },
+        duration: 1000,
+        complete() {
+          highlightNode.style({
+            borderColor: '#40a9ff',
+            borderWidth: 0,
+          });
+        },
+      });
+      highlightNode.animate({
+        style: { borderColor: 'red', borderWidth: borderWidthCur * 3 },
+        duration: 1000,
+        complete() {
+          highlightNode.style({
+            borderColor: '#40a9ff',
+            borderWidth: 0,
+            'min-zoomed-font-size': minZoomedFontSizeCur,
+          });
+        },
+      });
+    },
+    drawLine() {
+      const latencyRange = this.coloringThreshold.split(',');
+      const range = [0, ...latencyRange];
+      const colorRange = range.map((_, i) => {
+        const begin = _;
+        let end = 99999;
+        if (range.length > i + 1) {
+          end = range[i + 1];
+        }
+        return {
+          range: [begin, end],
+          color: this.LATENCY_COLOR_RANGE[i],
+        };
+      });
+      this.cy.style().selector('edge')
+        .css({
+          'width': (ele) => this.cpmFunc(ele),
+          'line-color': (ele) => this.lineColor(ele, colorRange),
+          'target-arrow-color': (ele) => this.lineColor(ele, colorRange),
+          'curve-style': 'bezier',
+          // 'control-point-step-size': 100,
+          'target-arrow-shape': 'triangle',
+          'arrow-scale': 1.2,
+          'opacity': 0.666,
+          'text-wrap': 'wrap',
+          'text-rotation': 'autorotate',
+        })
+        .update();
     },
   },
 };
 </script>
 <style lang="scss">
 .micro-topo-chart{
-  height: 100%;
+  /*height: 100%;*/
   width: 100%;
+  /*padding-bottom: 80px;*/
   .node-name {
     cursor: move;
     font-size:14px;

@@ -21,19 +21,19 @@ import endpointTemp from './endpoint-template';
 import instanceTemp from './instance-template';
 export default [
   {
-    name: 'Global',
+    name: '全局',
     children: globalTemp,
   },
   {
-    name: 'Service',
+    name: '应用',
     children: serviceTemp,
   },
   {
-    name: 'Endpoint',
+    name: '应用端点',
     children: endpointTemp,
   },
   {
-    name: 'Instance',
+    name: '应用实例',
     children: instanceTemp,
   },
 ];

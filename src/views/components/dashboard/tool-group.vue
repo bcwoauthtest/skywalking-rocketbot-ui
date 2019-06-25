@@ -67,7 +67,7 @@ export default class ToolGroup extends Vue {
   }
   private handleOption(index: any) {
     this.MIXHANDLE_CHANGE_GROUP(index);
-    return this.MIXHANDLE_GET_OPTION({compType: this.compType, duration: this.durationTime});
+    return this.MIXHANDLE_GET_OPTION({tenantId: this.rocketGlobal.currentTenant, compType: this.compType, duration: this.durationTime});
   }
   private handleHide() {
     this.name = '';

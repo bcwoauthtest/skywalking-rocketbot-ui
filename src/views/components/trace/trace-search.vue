@@ -34,7 +34,7 @@
         <TraceSelect :hasSearch="true" :title="this.$t('service')" :value="service" @input="chooseService" :data="rocketTrace.services"/>
         <TraceSelect :hasSearch="true" :title="this.$t('instance')" v-model="instance" :data="rocketTrace.instances"/>
         <TraceSelect  :title="this.$t('status')" :value="traceState" @input="chooseStatus"
-        :data="[{label:'All', key: 'ALL'}, {label:'Success', key: 'SUCCESS'}, {label:'Error', key: 'ERROR'}]"/>
+        :data="[{label:'全部', key: 'ALL'}, {label:'Success', key: 'SUCCESS'}, {label:'Error', key: 'ERROR'}]"/>
         <div class="mr-10" style="padding: 3px 15px 0">
           <div class="sm grey">{{this.$t('endpointName')}}</div>
           <input type="text"  v-model="endpointName" class="rk-trace-search-input">
@@ -47,7 +47,7 @@
         <input type="text" v-model="traceId" class="rk-trace-search-input dib">
       </div>
       <div class="mr-15">
-        <span class="sm b grey mr-10">{{this.$t('duration')}}:</span>
+        <span class="sm b grey mr-10">{{this.$t('range')}}:</span>
         <div class="rk-trace-search-range dib">
           <input class="vm tc" v-model="minTraceDuration">
           <span class="grey vm">-</span>
@@ -63,30 +63,33 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import { Action, Getter, State } from 'vuex-class';
-import { Trace, DurationTime, Option } from '../../../store/interfaces';
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Action, Getter, Mutation, State } from 'vuex-class';
+import { Trace, DurationTime, Option} from '../../../store/interfaces';
 import TraceSelect from './trace-select.vue';
 
 @Component({components: {TraceSelect}})
 export default class TraceTool extends Vue {
-  @State('rocketbot') private rocketbotGlobal: any;
+  @State('rocketbot') private rocketGlobal: any;
   @State('rocketTrace') private rocketTrace: any;
   @Getter('durationTime') private durationTime: any;
   @Action('rocketTrace/GET_SERVICES') private GET_SERVICES: any;
   @Action('rocketTrace/GET_INSTANCES') private GET_INSTANCES: any;
   @Action('rocketTrace/GET_TRACELIST') private GET_TRACELIST: any;
+  @Action('rocketTrace/GET_TRACE_SPANS') private GET_TRACE_SPANS: any;
   @Action('rocketTrace/SET_TRACE_FORM') private SET_TRACE_FORM: any;
+  @Mutation('rocketTrace/SET_CURRENT_TRACE') private SET_CURRENT_TRACE: any;
+  /*@Getter('currentTraceService') private service: any;*/
 
-  private time: Date[] = [new Date() , new Date()];
+  private service: Option  = {label: '所有', key: ''};
+  private time: Date[] = [new Date(new Date().getTime() - 900000) , new Date()];
   private status: boolean = true;
   private maxTraceDuration: string = '';
   private minTraceDuration: string = '';
-  private service: Option  = {label: 'All', key: ''};
-  private instance: Option  = {label: 'All', key: ''};
+  private instance: Option  = {label: '所有', key: ''};
   private endpointName: string = '';
   private traceId: string = '';
-  private traceState: Option  = {label: 'All', key: 'ALL'};
+  private traceState: Option  = {label: '全部', key: 'ALL'};
   private dateFormate = (date: Date, step: string) => {
     const year = date.getFullYear();
     const monthTemp = date.getMonth() + 1;
@@ -128,18 +131,19 @@ export default class TraceTool extends Vue {
     if (this.service.key === i.key) {
       return;
     }
-    this.instance = {label: 'All', key: ''};
+    this.instance = {label: '所有', key: ''};
     this.service = i;
     if (i.key === '') {
       return;
     }
     this.GET_INSTANCES({duration: this.durationTime, serviceId: i.key});
+    this.getTraceList();
   }
   private chooseStatus(i: any) {
     this.traceState = i;
   }
   private getTraceList() {
-    this.GET_SERVICES({duration: this.durationTime});
+    this.GET_SERVICES({tenantId: this.rocketGlobal.currentTenant, isAddress: '0', duration: this.durationTime});
     const temp: any = {
         queryDuration: this.globalTimeFormate(this.time),
         traceState:  this.traceState.key,
@@ -156,7 +160,16 @@ export default class TraceTool extends Vue {
     this.GET_TRACELIST();
   }
   private mounted() {
-    this.time = [this.rocketbotGlobal.duration.start, this.rocketbotGlobal.duration.end];
+    this.service = this.rocketGlobal.currentService;
+    this.time = [this.rocketGlobal.duration.start, this.rocketGlobal.duration.end];
+    this.SET_CURRENT_TRACE({
+      operationNames: [],
+      duration: 0,
+      isError: false,
+      key: '',
+      start: '',
+      traceIds: [],
+    });
     this.getTraceList();
   }
 }

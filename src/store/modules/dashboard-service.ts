@@ -50,6 +50,13 @@ const getters = {
 // mutations
 const mutations: MutationTree<State> = {
   [types.SET_SERVICES](state: State, data: any) {
+    for (const i in data) {
+      if (data[i].userDefName !== undefined && data[i].userDefName !== '') {
+        data[i].label = data[i].userDefName;
+      } else if (data[i].label.indexOf('@') !== -1) {
+        data[i].label = data[i].label.split('@')[0];
+      }
+    }
     state.services = data;
     if (!data.length) { return; }
     if (!state.currentService.key && data.length) {

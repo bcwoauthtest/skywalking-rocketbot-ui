@@ -18,29 +18,37 @@
 <template>
   <header class="rk-header flex-h">
     <div class="flex-h">
-      <svg class="svg-logo icon" style="margin-right:35px;margin-top:-5px">
-        <use xlink:href="#logo-sw"></use>
+      <svg class="svg-logo icon" style="margin-right:5px;margin-top:-5px">
+        <use xlink:href="#baocloud"></use>
       </svg>
-      <span class="grey rocketbot">Rocketbot</span>
-      <router-link class="nav-link mr-20" to="/" exact>
-        <svg class="icon sm vm">
-          <use xlink:href="#chart"></use>
-        </svg>
-        <span class="vm hide-xs ml-5">{{this.$t('dashboard')}}</span>
-      </router-link>
-      <router-link class="nav-link mr-20" to="/topology">
+      <span class="grey logo">宝之云分布式链路分析服务</span>
+      <!--<img class="mr10" :src="require('@/assets/img/baocloud.svg')" style="width:32px;"/>
+      <span class="logo">CloudWalker</span>-->
+      <router-link class="nav-link mr-20" :to="{name:'topo', params:{tenantId: (rocketbotGlobal.currentTenant === undefined ? '': rocketbotGlobal.currentTenant)}}">
         <svg class="icon sm vm">
           <use xlink:href="#issues"></use>
         </svg>
         <span class="vm hide-xs ml-5">{{this.$t('topology')}}</span>
       </router-link>
-      <router-link class="nav-link mr-20" to="/trace">
+      <router-link class="nav-link mr-20" :to="{name:'trace', params:{tenantId: (rocketbotGlobal.currentTenant === undefined ? '': rocketbotGlobal.currentTenant)}}">
         <svg class="icon sm vm">
           <use xlink:href="#merge"></use>
         </svg>
         <span class="vm hide-xs ml-5">{{this.$t('trace')}}</span>
       </router-link>
-      <router-link class="nav-link mr-20" to="/alarm">
+      <!--<router-link class="nav-link mr-20" :to="{name:'log', params:{tenantId: (rocketbotGlobal.currentTenant === undefined ? '': rocketbotGlobal.currentTenant)}}">-->
+        <!--<svg class="icon sm vm">-->
+          <!--<use xlink:href="#log"></use>-->
+        <!--</svg>-->
+        <!--<span class="vm hide-xs ml-5">{{this.$t('logs')}}</span>-->
+      <!--</router-link>-->
+      <router-link class="nav-link mr-20" :to="{name:'dashboard', params:{tenantId: (rocketbotGlobal.currentTenant === undefined ? '': rocketbotGlobal.currentTenant)}}">
+        <svg class="icon sm vm">
+          <use xlink:href="#chart"></use>
+        </svg>
+        <span class="vm hide-xs ml-5">{{this.$t('dashboard')}}</span>
+      </router-link>
+      <router-link class="nav-link mr-20" :to="{name:'alarm', params:{tenantId: (rocketbotGlobal.currentTenant === undefined ? '': rocketbotGlobal.currentTenant)}}">
         <svg class="icon sm vm">
           <use xlink:href="#spam"></use>
         </svg>
@@ -48,7 +56,8 @@
       </router-link>
     </div>
     <div class="flex-h">
-      <a class="rk-btn mr-5 sm" :class="auto?'blue':'ghost'" @click="handleAuto">
+      <RkBsSelect :options="rocketbotGlobal.tenantBs" :selectedBs="rocketbotGlobal.selectedBsArray"/>
+      <!--<a class="rk-btn mr-5 sm" :class="auto?'blue':'ghost'" @click="handleAuto">
         <span class="vm">{{this.$t('auto')}}</span>
       </a>
       <a class="rk-btn mr-15 sm ghost" @click="handleReload">
@@ -56,8 +65,8 @@
           <use xlink:href="#retry"></use>
         </svg>
         <span class="vm">{{this.$t('reload')}}</span>
-      </a>
-      <a class="rk-header-user" v-clickout="handleHide">
+      </a>-->
+      <!--<a class="rk-header-user" v-clickout="handleHide">
         <div @click="handleShow" class="rk-btn" :class="show? 'blue' : 'ghost'">
           <svg class="icon vs">
             <use xlink:href="#user"></use>
@@ -73,23 +82,33 @@
             </svg>
             {{this.$t('signout')}}</div>
         </div>
-      </a>      
+      </a>      -->
   </div>
   </header>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { Action, State } from 'vuex-class';
+import { Action, State, Getter, Mutation } from 'vuex-class';
 import timeFormat from '@/utils/timeFormat';
-
-@Component
+import RkBsSelect from './rk-bs-select.vue';
+@Component({
+    components: {RkBsSelect},
+})
 export default class Header extends Vue {
   @State('rocketbot') private rocketbotGlobal: any;
   @Action('SET_DURATION') private SET_DURATION: any;
+  @Mutation('SET_CURRENT_TENANT') private SET_CURRENT_TENANT: any;
+  @Mutation('SET_URL_BS_PARAM') private SET_URL_BS_PARAM: any;
+  @Action('GET_TENANT_BS_INFO') private GET_TENANT_BS_INFO: any;
+  @Getter('tenantBs') private tenantBs: any;
+  @Getter('selectedBs') private selectedBs: any;
+  @Getter('currentTenant') private currentTenant: any;
   private show: boolean = false;
   private auto: boolean = false;
   private timer: any = null;
+  private topoParam: any = '';
+
   private handleReload() {
     const gap = this.rocketbotGlobal.duration.end.getTime() - this.rocketbotGlobal.duration.start.getTime();
     const w = window as any;
@@ -135,8 +154,8 @@ export default class Header extends Vue {
   background-color: #252a2f;
   box-shadow: 0 1px 2px 0 rgba(26, 24, 29, 0.24);
   .svg-logo {
-    width: 90px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
   }
   .rocketbot{
     padding-top: 27px;
